@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useAccount } from 'wagmi';
+import { Loader2, Shield, Zap, Wallet } from 'lucide-react';
+import { toast } from 'sonner';
 
-// Components (relative path – SAFE)
+// 👇 FIX: Relative path and Named Import
 import ChatMessages from '../components/ChatMessages';
 import ChatInput from '../components/ChatInput';
 import { PayWallModal } from '../components/PayWallModal';
@@ -11,109 +14,96 @@ type Message = {
   id: string;
   content: string;
   role: 'user' | 'assistant';
+  timestamp?: Date;
   paid?: boolean;
 };
 
 export default function Home() {
-  // 🔥 Demo mode – wallet logic later
-  const isConnected = true;
-
+  const { isConnected } = useAccount();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showPayWall, setShowPayWall] = useState(false);
   const [pendingQuery, setPendingQuery] = useState('');
 
   const handleSendMessage = async (content: string) => {
+    if (!isConnected) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
     if (!content.trim()) return;
 
-    // First 3 queries free
-    const freeQueriesLeft = messages.filter(m => m.role === 'user').length < 3;
+    // First 3 messages free logic
+    const hasPaid = messages.length < 3; 
 
-    if (!freeQueriesLeft) {
+    if (!hasPaid) {
       setPendingQuery(content);
       setShowPayWall(true);
       return;
     }
 
-    processMessage(content, true);
+    await processMessage(content, true);
   };
 
-  const processMessage = (content: string, isPaid: boolean) => {
+  const processMessage = async (content: string, isPaid: boolean) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       content,
       role: 'user',
+      timestamp: new Date(),
       paid: isPaid,
     };
 
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
 
-    // 🔥 Demo AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content:
-          '✅ This is a demo AI response.\n\nGroq + Circle integration will be added after hackathon 🚀',
-        role: 'assistant',
-        paid: isPaid,
-      };
+    try {
+      // Demo Response
+      setTimeout(() => {
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          content: "This is a secure AI response powered by Groq & Circle! 🚀 (Demo Mode)",
+          role: 'assistant',
+          timestamp: new Date(),
+          paid: isPaid,
+        };
+        setMessages(prev => [...prev, aiMessage]);
+        setIsLoading(false);
+        toast.success('Response generated!');
+      }, 1500);
 
-      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Failed to generate response');
       setIsLoading(false);
-    }, 1500);
-  };
-
-  const handlePaymentComplete = () => {
-    if (pendingQuery) {
-      processMessage(pendingQuery, true);
-      setPendingQuery('');
     }
-    setShowPayWall(false);
   };
 
   return (
-    <div className="max-w-4xl mx-auto min-h-screen flex flex-col px-4 py-8">
-
-      {/* Header */}
+    <div className="container mx-auto px-4 py-8 max-w-4xl min-h-screen flex flex-col">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-2">PayPerInsight AI</h1>
-        <p className="text-gray-500">
-          First 3 queries free • Then pay per insight
-        </p>
+        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+          PayPerInsight AI
+        </h2>
+        <p className="text-gray-600 dark:text-gray-400">Secure Crypto Payments • Groq AI</p>
       </div>
 
       {!isConnected ? (
-        <div className="flex-1 flex items-center justify-center">
-          <div className="border rounded-2xl p-6 text-center">
-            <p className="mb-4">🔒 Please connect your wallet</p>
-            <button className="bg-purple-600 text-white px-6 py-2 rounded-full">
-              Connect Wallet
-            </button>
+        <div className="flex-1 flex items-center justify-center py-12">
+          <div className="text-center p-8 bg-white dark:bg-gray-900 rounded-2xl border dark:border-gray-800 shadow-xl">
+             <Wallet className="w-12 h-12 mx-auto mb-4 text-purple-600" />
+             <h3 className="text-xl font-bold mb-2">Connect Wallet</h3>
+             <p className="text-gray-500 mb-6">Please connect via the navbar to start chatting.</p>
           </div>
         </div>
       ) : (
-        <div className="flex-1 flex flex-col border rounded-2xl overflow-hidden">
-
+        <div className="flex-1 flex flex-col min-h-[500px] border rounded-2xl bg-white dark:bg-gray-900 overflow-hidden">
           <ChatMessages messages={messages} isLoading={isLoading} />
-
           <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
         </div>
       )}
 
-      {/* Loading Overlay */}
-      {isLoading && (
-        <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-white p-4 rounded-xl shadow">
-            ⏳ Generating AI response...
-          </div>
-        </div>
-      )}
-
-      {/* Paywall */}
-      {showPayWall && (
-        <PayWallModal />
-      )}
+      {showPayWall && <PayWallModal />}
     </div>
   );
 }
