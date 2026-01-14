@@ -5,7 +5,7 @@ import { metaMask } from 'wagmi/connectors';
 export const config = createConfig({
   chains: [sepolia],
   connectors: [
-    metaMask()
+    metaMask() // ❌ walletConnect REMOVE
   ],
   transports: {
     [sepolia.id]: http()
