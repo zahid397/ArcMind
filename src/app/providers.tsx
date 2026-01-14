@@ -7,7 +7,6 @@ import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import { config } from '@/lib/wagmi';
 
-// 🚫 RainbowKit SSR disable
 const RainbowKitProvider = dynamic(
   () => import('@rainbow-me/rainbowkit').then(m => m.RainbowKitProvider),
   { ssr: false }
