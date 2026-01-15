@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+requests
+groq
+pydantic
+aiohttp
+python-multipart
+cors
