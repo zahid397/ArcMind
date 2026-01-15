@@ -3,28 +3,33 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 5, 5, 17;
-  --background-end-rgb: 0, 0, 0;
+  --bg-dark: #050511;
+  --primary: #00f2ff; /* Cyan */
+  --secondary: #bd00ff; /* Purple */
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: radial-gradient(circle at 10% 20%, rgba(189, 0, 255, 0.1) 0%, transparent 40%),
-              radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.1) 0%, transparent 40%);
-  background-color: #050511;
+  background-color: var(--bg-dark);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(189, 0, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(0, 242, 255, 0.08) 0%, transparent 50%);
+  color: #ffffff;
   min-height: 100vh;
-  overflow: hidden;
+  font-family: 'Inter', sans-serif;
 }
 
-/* Typing Indicator Animation */
-.typing-dot {
-  animation: bounce 1s infinite;
-}
-.typing-dot:nth-child(2) { animation-delay: 0.2s; }
-.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); opacity: 0.5; }
-  50% { transform: translateY(-5px); opacity: 1; }
+/* Animation Utils */
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
