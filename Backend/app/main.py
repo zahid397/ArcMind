@@ -1,30 +1,30 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.api.routes import router
+from app.api import routes
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Multi-Model AI Agent Backend (Groq, DeepSeek, Gemini)"
+    docs_url="/docs"
 )
 
-# CORS (Open for Hackathon)
+# CORS Setup (Allow Frontend)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"], # Hackathon-এর জন্য সব ওপেন
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Routes
-app.include_router(router, prefix="/api/v1", tags=["Agent"])
+# Connect Routes
+app.include_router(routes.router, prefix="/api/agent", tags=["Autonomous Agent"])
 
 @app.get("/")
 def health_check():
-    return {
-        "status": "active", 
-        "ai_models": ["groq", "deepseek", "gemini"],
-        "payment_provider": "Circle"
-    }
-  
+    return {"status": "online", "system": "ArcMind Brain 🧠"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    
