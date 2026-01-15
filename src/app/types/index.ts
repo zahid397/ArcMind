@@ -1,19 +1,17 @@
-export type Role = 'user' | 'bot';
+export interface Transaction {
+  amount: string;
+  currency: string;
+  tx_hash: string;
+  explorer_url: string;
+}
 
 export interface Message {
   id: string;
-  role: Role;
-  text?: string;       // User message or Bot error/info
-  preview?: string;    // Bot preview content
-  fullAnswer?: string; // Bot hidden content
-  price?: number;      // USDC Price
-  isLocked?: boolean;  // Paywall state
-  isLoading?: boolean; // For typing indicator
-}
-
-export interface ChatResponse {
-  preview: string;
-  full_answer_hidden: string;
-  price_usdc: number;
-  status: string;
+  role: 'user' | 'assistant';
+  content: string;
+  reasoning?: string;
+  tool_used?: string;
+  image_url?: string;
+  transaction?: Transaction;
+  timestamp: number;
 }
