@@ -23,27 +23,19 @@ The agent autonomously analyzes user tasks, calculates the required budget, and 
 
 
 
-
-## 🏗️ Architecture
-The system consists of a **Next.js Frontend** and a **FastAPI Backend Agent**.
-
-
+### 🏗️ Architecture
+The system consists of a high-performance FastAPI Backend and a reactive Next.js Frontend.
 
 ```mermaid
 graph LR
     A[User] --> B[Frontend UI]
     B --> C[FastAPI Backend]
-    C --> D[Agent Logic]
+    C --> D[AI Agent Logic]
     D --> E[Groq LLM]
     C --> F[Payment Service]
     F --> G[Arc Network]
     G --> C
     C --> B
-
-
-
-
-
 🛠️ Tech Stack
 Frontend
 Framework: Next.js 14 (App Router)
