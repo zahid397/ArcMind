@@ -20,22 +20,20 @@ The agent autonomously analyzes user tasks, calculates the required budget, and 
 - **⚡ Fast Inference** — Groq (Mixtral) for low-latency reasoning
 - **🎨 Modern UI** — Cyberpunk-inspired interface with smooth UX
 - **🔗 Onchain Settlement** — Payments verified via Arc network
+## 🏗️ Architecture
 
+ArcMind follows a clean separation between frontend UI, backend agent logic, and onchain settlement.
 
+**Flow:**
+1. User submits a task from the frontend UI
+2. The FastAPI backend agent analyzes the task
+3. The agent selects the appropriate AI tool (Groq / Gemini)
+4. The agent calculates the required USDC cost
+5. A micropayment is executed via Circle infrastructure
+6. Payment settles on the Arc Testnet
+7. The final result is returned to the user interface
 
-### 🏗️ Architecture
-The system consists of a high-performance FastAPI Backend and a reactive Next.js Frontend.
-
-```mermaid
-graph LR
-    A[User] --> B[Frontend UI]
-    B --> C[FastAPI Backend]
-    C --> D[AI Agent Logic]
-    D --> E[Groq LLM]
-    C --> F[Payment Service]
-    F --> G[Arc Network]
-    G --> C
-    C --> B
+This design ensures **agentic autonomy**, **transparent pricing**, and **onchain settlement**.
 🛠️ Tech Stack
 Frontend
 Framework: Next.js 14 (App Router)
