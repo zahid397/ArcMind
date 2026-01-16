@@ -1,29 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  
-  // 🚀 REQUIRED: Enables static export to generate an 'out' folder
-  // This allows you to host for FREE on Cloudflare Pages or Render Static Sites.
+
+  // Static export for free hosting
   output: 'export',
 
+  // Prevent routing issues on static hosts
+  trailingSlash: true,
+
   images: {
-    // ⚠️ REQUIRED: The default Next.js Image Optimization API does not work with 
-    // static exports. We must disable it to avoid build errors.
-    unoptimized: true, 
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'plus.unsplash.com',
-      },
-    ],
+    // Required for static export
+    unoptimized: true,
   },
 
   eslint: {
-    // Ignores linting warnings during the build process to prevent deployment failures.
+    // Prevent build failures due to lint warnings
     ignoreDuringBuilds: true,
   },
 };
