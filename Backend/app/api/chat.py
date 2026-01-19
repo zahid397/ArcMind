@@ -1,13 +1,19 @@
-from fastapi import APIRouter
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException
+from app.models.schemas import AgentRequest
+from app.api.routes import execute_task
 
 router = APIRouter()
 
-class ChatRequest(BaseModel):
-    message: str
-
 @router.post("/chat")
-async def chat_endpoint(data: ChatRequest):
-    return {
-        "response": f"Live AI response for: {data.message}"
-    }
+async def chat_adapter(request: dict):
+    message = request.get("message")
+
+    if not message:
+        raise HTTPException(status_code=400, detail="Message is required")
+
+    agent_request = AgentRequest(
+        task=message,
+        model_preference="deepseek"
+    )
+
+    return await execute_task(agent_request)
