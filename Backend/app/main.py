@@ -1,43 +1,83 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.core.config import settings
-from app.api import routes, chat
+from pydantic import BaseModel
+import asyncio
+import time
+import random
 
-app = FastAPI(
-    title=settings.PROJECT_NAME,
-    version=settings.VERSION,
-    docs_url="/docs"
-)
+app = FastAPI(title="ArcMind AI Agent", version="1.0")
 
-# CORS (Hackathon friendly)
+# 1. CORS Setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Hackathon-friendly
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Existing agent routes
-app.include_router(
-    routes.router,
-    prefix="/api/agent",
-    tags=["Autonomous Agent"]
-)
+# 2. Input Model
+class AgentRequest(BaseModel):
+    prompt: str
 
-# 🔥 NEW: Frontend compatible chat route
-app.include_router(
-    chat.router,
-    prefix="/api",
-    tags=["Chat Adapter"]
-)
+# 3. Dummy Product Database
+products_db = {
+    "iphone": {"price": 999, "name": "iPhone 15 Pro", "stock": "In Stock"},
+    "macbook": {"price": 1299, "name": "MacBook Air M2", "stock": "In Stock"},
+    "coffee": {"price": 5, "name": "Starbucks Latte", "stock": "Low Stock"},
+    "shoe": {"price": 120, "name": "Nike Air Jordan", "stock": "In Stock"},
+}
 
-@app.get("/")
-def health_check():
+# 4. Smart Mock AI Logic
+def get_mock_ai_response(prompt: str):
+    prompt = prompt.lower()
+
+    if any(word in prompt for word in ["price", "cost", "buy", "find"]):
+        for key, product in products_db.items():
+            if key in prompt:
+                return (
+                    f"🔍 Found deal: **{product['name']}** is available for "
+                    f"**${product['price']} USDC**. Status: {product['stock']}. "
+                    "Shall I verify the transaction?"
+                )
+        return "🤔 I couldn't find that item. Try searching for iPhone, MacBook, or Shoes."
+
+    elif any(word in prompt for word in ["balance", "wallet", "money"]):
+        return "💰 Your Circle Wallet balance is **$2,450.50 USDC**. Recent spending: $45 on Amazon."
+
+    elif any(word in prompt for word in ["hello", "hi", "hey"]):
+        return "👋 Hey! I’m your autonomous AI commerce agent. What would you like me to find or buy?"
+
+    else:
+        return random.choice([
+            "🤖 Processing your request… could you specify the product name?",
+            "⚙️ Analyzing market trends. Please clarify your intent.",
+            "📡 Connected to Circle payment network. Awaiting next command."
+        ])
+
+# 5. Main Agent Endpoint
+@app.post("/agent/command")
+async def run_agent(request: AgentRequest):
+    print(f"[Agent] User prompt: {request.prompt}")
+
+    # Simulate AI thinking
+    await asyncio.sleep(1.5)
+
+    ai_response = get_mock_ai_response(request.prompt)
+
     return {
-        "status": "online",
-        "system": "ArcMind Brain 🧠"
+        "status": "completed",
+        "message": ai_response,
+        "timestamp": time.time()
     }
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000)
+# 6. Health Check (Judge-friendly)
+@app.get("/")
+def health():
+    return {
+        "status": "online",
+        "agent": "ArcMind AI",
+        "mode": "mock-demo"
+    }
+
+# Run: uvicorn main:app --reload
