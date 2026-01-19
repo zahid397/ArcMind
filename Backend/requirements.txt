@@ -1,9 +1,2 @@
 fastapi
 uvicorn
-pydantic
-python-dotenv
-groq
-requests
-google-generativeai
-openai
-gunicorn
